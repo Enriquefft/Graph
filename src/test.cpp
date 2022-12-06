@@ -57,15 +57,25 @@ template <typename vertex> void printVector(const vector<vertex> &values) {
 
 int main() {
   Graph<char, true> graph;
-  graph.addEdge('a', 'c', 1);
-  graph.addEdge('c', 'd', 2);
-  graph.addEdge('d', 'e', 3);
-  graph.addEdge('e', 'b', 1);
-  graph.addEdge('a', 'b', 1);
+  graph.addEdge('A', 'B', 5);
+  graph.addEdge('A', 'C', 7);
+  graph.addEdge('B', 'C', 9);
 
-  graph.addVertex('x');
+  graph.addEdge('C', 'D', 8);
+  graph.addEdge('C', 'E', 7);
+  graph.addEdge('E', 'D', 5);
 
-  printIndexedMatrix(graph.getAdjacencyMatrix(), graph.getVertices());
-  std::cout << std::endl << std::endl;
-  printVector(graph.getShortestPath('a', 'x'));
+  graph.addEdge('B', 'E', 15);
+  graph.addEdge('B', 'F', 6);
+
+  graph.addEdge('E', 'F', 8);
+  graph.addEdge('E', 'G', 9);
+  graph.addEdge('G', 'F', 11);
+
+  auto met = graph.getMinimumExpansionTree();
+
+  for (const auto &edge : met) {
+    std::cout << std::get<0>(edge) << " - " << std::get<1>(edge) << " : "
+              << std::get<2>(edge) << std::endl;
+  }
 }

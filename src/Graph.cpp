@@ -1,4 +1,6 @@
 #include "Graph.h"
+#include <algorithm>
+#include <array>
 #include <limits>
 #include <queue>
 
@@ -11,7 +13,7 @@ using std::vector;
 */
 
 template <typename vertex_t, bool directed>
-auto Graph<vertex_t, false, directed>::getEdgeList()
+auto Graph<vertex_t, false, directed>::getEdgeList() const
     -> vector<std::pair<vertex_t, vertex_t>> {
 
   vector<std::pair<vertex_t, vertex_t>> edgeList;
@@ -32,7 +34,9 @@ auto Graph<vertex_t, false, directed>::getEdgeList()
         edgeList.emplace_back(
             std::make_pair(lookup_table.at(rowIdx), lookup_table.at(colIdx)));
       }
+      colIdx++;
     }
+    rowIdx++;
   } // O(V²)
 
   return edgeList;
@@ -65,18 +69,27 @@ void Graph<vertex_t, false, directed>::addEdge(const vertex_t &fromV,
 */
 
 template <typename vertex_t, bool directed>
-auto Graph<vertex_t, true, directed>::getEdgeList()
+auto Graph<vertex_t, true, directed>::getEdgeList() const
     -> vector<std::tuple<vertex_t, vertex_t, unsigned int>> {
 
   vector<std::tuple<vertex_t, vertex_t, unsigned int>> edgeList;
 
   for (unsigned int rowIdx = 0; const auto &row : m_adjMatrix) {
     for (unsigned int colIdx = 0; const unsigned int &col : row) {
-      if (col > 0) {
+
+      // find inverse in edgeList
+      bool inverseFound = std::find(edgeList.begin(), edgeList.end(),
+                                    std::make_tuple(lookup_table.at(colIdx),
+                                                    lookup_table.at(rowIdx),
+                                                    col)) != edgeList.end();
+
+      if (col > 0 && !inverseFound) {
         edgeList.emplace_back(std::make_tuple(lookup_table.at(rowIdx),
                                               lookup_table.at(colIdx), col));
       }
+      colIdx++;
     }
+    rowIdx++;
   } // O(V²)
 
   return edgeList;
@@ -134,7 +147,7 @@ auto Graph<vertex_t, true, directed>::getCheapestPath(const vertex_t &fromV,
 
   std::priority_queue<std::pair<unsigned int, vertex_t>,
                       std::vector<std::pair<unsigned int, vertex_t>>,
-                      std::greater<std::pair<unsigned int, vertex_t>>>
+                      std::greater<>>
       queue;
 
   queue.emplace(std::make_pair(0, fromV));
@@ -184,6 +197,75 @@ auto Graph<vertex_t, true, directed>::getCheapestPath(const vertex_t &fromV,
   return std::vector<std::pair<unsigned int, vertex_t>>(path.rbegin(),
                                                         path.rend());
 }
+
+/*
+template <typename vertex_t, bool directed>
+template <OutputType Type>
+auto Graph<vertex_t, true, directed>::formatGraphOutput(
+    const WeightedEdgeList &edgeList) const
+    -> triConditional_t<Type, vertex_t, true> {
+  return edgeList;
+}
+*/
+
+/*
+template <typename vertex_t, bool directed>
+template <OutputType Type>
+auto Graph<vertex_t, true, directed>::getMinimumExpansionTree() const
+    -> triConditional_t<Type, vertex_t, true> {
+
+  auto vertices = getVertices();
+
+  auto edgeList = getEdgeList();
+
+  // sort edges by weight
+  std::sort(edgeList.begin(), edgeList.end(), [](auto &left, auto &right) {
+    return std::get<2>(left) < std::get<2>(right);
+  });
+
+  std::vector<std::tuple<vertex_t, vertex_t, unsigned int>> met;
+
+  for (const auto &edge : edgeList) {
+
+    if (vertices.empty()) {
+      break;
+    }
+
+    auto fromV =
+        std::find_if(vertices.begin(), vertices.end(), [edge](auto vertex) {
+          return vertex == std::get<0>(edge);
+        });
+    auto toV =
+        std::find_if(vertices.begin(), vertices.end(), [edge](auto vertex) {
+          return vertex == std::get<1>(edge);
+        });
+
+    if (fromV == vertices.end() && toV == vertices.end()) {
+      continue;
+    }
+    vertices.erase(fromV);
+    vertices.erase(toV);
+
+    met.push_back(edge);
+  }
+
+  triConditional_t<Type, vertex_t, true> return_value;
+
+  switch (Type) {
+  case OutputType::EdgeList:
+    return_value = formatGraph<Type>(met);
+    break;
+  case OutputType::AdjacencyMatrix:
+    throw std::runtime_error("Adjacency Matrix Not implemented");
+    break;
+  // return getAdjacencyMatrix(met);
+  case OutputType::AdjacencyList:
+    throw std::runtime_error("Adjacency List Not implemented");
+    break;
+    // return getAdjacencyList(met);
+  }
+}
+*/
 
 // explicit instantiation
 template class Graph<int, false, false>;
