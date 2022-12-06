@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-template <typename vertex_t, bool weighted> //
+template <typename vertex_t, bool weighted, bool directed> //
 class BaseGraph {
 
 protected:

@@ -2,22 +2,17 @@
 #include <iostream>
 
 int main() {
-  Graph<int, false> graph = Graph<int, false>();
-  graph.addVertex(1);
-  graph.addVertex(2);
-  graph.addEdge(1, 3);
+  Graph<char, true> graph;
+  graph.addEdge('a', 'b', 20);
+  graph.addEdge('a', 'c', 1);
+  graph.addEdge('c', 'd', 2);
+  graph.addEdge('d', 'e', 3);
+  graph.addEdge('e', 'b', 4);
 
-  auto vertex = graph.getVertices();
-  auto mat = graph.getAdjacencyMatrix();
+  auto path = graph.getCheapestPath('a', 'b');
 
-  for (auto vert : vertex) {
-    std::cout << vert << std::endl;
-  }
-
-  for (const auto &row : mat) {
-    for (const auto &col : row) {
-      std::cout << col << ' ';
-    }
-    std::cout << '\n';
+  for (auto node : path) {
+    std::cout << "weight:\t" << node.first << "\tvalue:\t" << node.second
+              << std::endl;
   }
 }

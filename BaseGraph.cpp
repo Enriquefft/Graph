@@ -2,8 +2,8 @@
 #include <queue>
 #include <stdexcept>
 
+#include "../utils/utils.h"
 #include "BaseGraph.h"
-#include "utils.h"
 
 using std::vector;
 using utils::unsignedCast;
@@ -15,17 +15,17 @@ using utils::unsignedCast;
 */
 
 // ################ IS VERTEX ##################
-template <typename vertex_t, bool weighted>
-auto BaseGraph<vertex_t, weighted>::isVertex(const vertex_t &vertex) const
-    -> bool {
+template <typename vertex_t, bool weighted, bool directed>
+auto BaseGraph<vertex_t, weighted, directed>::isVertex(
+    const vertex_t &vertex) const -> bool {
 
   return m_vertices.contains(vertex);
 }
 
 // ################ IS EDGE ##################
-template <typename vertex_t, bool weighted>
-bool BaseGraph<vertex_t, weighted>::isEdge(const vertex_t &fromV,
-                                           const vertex_t &toV) const {
+template <typename vertex_t, bool weighted, bool directed>
+bool BaseGraph<vertex_t, weighted, directed>::isEdge(
+    const vertex_t &fromV, const vertex_t &toV) const {
   if (!isVertex(fromV) || !isVertex(toV)) {
     return false;
   }
@@ -33,8 +33,9 @@ bool BaseGraph<vertex_t, weighted>::isEdge(const vertex_t &fromV,
 }
 
 // ################ ADD VERTEX ##################
-template <typename vertex_t, bool weighted>
-void BaseGraph<vertex_t, weighted>::addVertex(const vertex_t &vertex) {
+template <typename vertex_t, bool weighted, bool directed>
+void BaseGraph<vertex_t, weighted, directed>::addVertex(
+    const vertex_t &vertex) {
   if (isVertex(vertex)) {
     throw std::runtime_error("Vertex already exists");
   }
@@ -49,8 +50,8 @@ void BaseGraph<vertex_t, weighted>::addVertex(const vertex_t &vertex) {
 }
 
 // ################ VERTEX HAS EDGES ##################
-template <typename vertex_t, bool weighted>
-bool BaseGraph<vertex_t, weighted>::vertexHasEdges(
+template <typename vertex_t, bool weighted, bool directed>
+bool BaseGraph<vertex_t, weighted, directed>::vertexHasEdges(
     const vertex_t &vertex) const {
 
   if (!isVertex(vertex)) {
@@ -70,9 +71,9 @@ bool BaseGraph<vertex_t, weighted>::vertexHasEdges(
 }
 
 // ################ REMOVE VERTEX ##################
-template <typename vertex_t, bool weighted>
-void BaseGraph<vertex_t, weighted>::removeVertex(const vertex_t &vertex,
-                                                 const bool &force) {
+template <typename vertex_t, bool weighted, bool directed>
+void BaseGraph<vertex_t, weighted, directed>::removeVertex(
+    const vertex_t &vertex, const bool &force) {
   if (!isVertex(vertex)) {
     throw std::runtime_error("Vertex does not exist");
   }
@@ -105,9 +106,9 @@ void BaseGraph<vertex_t, weighted>::removeVertex(const vertex_t &vertex,
 }
 
 // ################ REMOVE EDGE ##################
-template <typename vertex_t, bool weighted>
-void BaseGraph<vertex_t, weighted>::removeEdge(const vertex_t &fromV,
-                                               const vertex_t &toV) {
+template <typename vertex_t, bool weighted, bool directed>
+void BaseGraph<vertex_t, weighted, directed>::removeEdge(const vertex_t &fromV,
+                                                         const vertex_t &toV) {
 
   if (!isEdge(fromV, toV)) {
     throw std::runtime_error("Edge does not exist");
@@ -116,14 +117,16 @@ void BaseGraph<vertex_t, weighted>::removeEdge(const vertex_t &fromV,
 }
 
 // ################ GET VERTEX COUNT ##################
-template <typename vertex_t, bool weighted>
-auto BaseGraph<vertex_t, weighted>::getVertexCount() const -> unsigned int {
+template <typename vertex_t, bool weighted, bool directed>
+auto BaseGraph<vertex_t, weighted, directed>::getVertexCount() const
+    -> unsigned int {
   return unsignedCast(m_vertices.size());
 }
 
 // ################ GET EDGE COUNT ##################
-template <typename vertex_t, bool weighted>
-auto BaseGraph<vertex_t, weighted>::getEdgeCount() const -> unsigned int {
+template <typename vertex_t, bool weighted, bool directed>
+auto BaseGraph<vertex_t, weighted, directed>::getEdgeCount() const
+    -> unsigned int {
   unsigned int count = 0;
   for (const auto &row : m_adjMatrix) {
     count += std::count(row.begin(), row.end(), true);
@@ -132,8 +135,8 @@ auto BaseGraph<vertex_t, weighted>::getEdgeCount() const -> unsigned int {
 }
 
 // ################ GET ADJACENT VERTICES ##################
-template <typename vertex_t, bool weighted>
-auto BaseGraph<vertex_t, weighted>::getAdjacentVertices(
+template <typename vertex_t, bool weighted, bool directed>
+auto BaseGraph<vertex_t, weighted, directed>::getAdjacentVertices(
     const vertex_t &vertex) const -> std::vector<vertex_t> {
 
   if (!isVertex(vertex)) {
@@ -152,8 +155,8 @@ auto BaseGraph<vertex_t, weighted>::getAdjacentVertices(
 }
 
 // ################ GET VERTICES ##################
-template <typename vertex_t, bool weighted>
-auto BaseGraph<vertex_t, weighted>::getVertices() const
+template <typename vertex_t, bool weighted, bool directed>
+auto BaseGraph<vertex_t, weighted, directed>::getVertices() const
     -> std::vector<vertex_t> {
 
   vector<vertex_t> verticesList;
@@ -165,10 +168,9 @@ auto BaseGraph<vertex_t, weighted>::getVertices() const
 }
 
 // ################ GET SHORTEST PATH ##################
-template <typename vertex_t, bool weighted>
-auto BaseGraph<vertex_t, weighted>::getShortestPath(const vertex_t &fromV,
-                                                    const vertex_t &toV) const
-    -> std::vector<vertex_t> {
+template <typename vertex_t, bool weighted, bool directed>
+auto BaseGraph<vertex_t, weighted, directed>::getShortestPath(
+    const vertex_t &fromV, const vertex_t &toV) const -> std::vector<vertex_t> {
 
   if (!isVertex(fromV) || !isVertex(toV)) {
     throw std::runtime_error("Vertex does not exist");
@@ -208,11 +210,12 @@ auto BaseGraph<vertex_t, weighted>::getShortestPath(const vertex_t &fromV,
     path.push_back(current);
     current = previous[m_vertices.at(current)];
   }
-  return path;
+  path.push_back(fromV);
+  return std::vector<vertex_t>(path.rbegin(), path.rend());
 }
 
-template <typename vertex_t, bool weighted>
-auto BaseGraph<vertex_t, weighted>::getAdjacencyMatrix() const
+template <typename vertex_t, bool weighted, bool directed>
+auto BaseGraph<vertex_t, weighted, directed>::getAdjacencyMatrix() const
     -> std::vector<std::vector<weight_t>> {
   return m_adjMatrix;
 }
@@ -220,13 +223,13 @@ auto BaseGraph<vertex_t, weighted>::getAdjacencyMatrix() const
 // Explicit instantiations
 //
 // BaseGraph
-template class BaseGraph<int, false>;
-template class BaseGraph<int, true>;
-template class BaseGraph<std::string, false>;
-template class BaseGraph<std::string, true>;
-template class BaseGraph<char, false>;
-template class BaseGraph<char, true>;
-template class BaseGraph<float, false>;
-template class BaseGraph<float, true>;
-template class BaseGraph<double, false>;
-template class BaseGraph<double, true>;
+template class BaseGraph<int, false, false>;
+template class BaseGraph<int, true, false>;
+template class BaseGraph<std::string, false, false>;
+template class BaseGraph<std::string, true, false>;
+template class BaseGraph<char, false, false>;
+template class BaseGraph<char, true, false>;
+template class BaseGraph<float, false, false>;
+template class BaseGraph<float, true, false>;
+template class BaseGraph<double, false, false>;
+template class BaseGraph<double, true, false>;
