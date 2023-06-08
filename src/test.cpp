@@ -1,4 +1,4 @@
-#include "Graph.h"
+#include "Graph.hpp"
 #include <iostream>
 #include <vector>
 
@@ -56,23 +56,36 @@ template <typename vertex> void printVector(const vector<vertex> &values) {
 }
 
 int main() {
-  Graph<char, true> graph;
-  graph.addEdge('A', 'B', 5);
-  graph.addEdge('A', 'C', 7);
-  graph.addEdge('B', 'C', 9);
 
-  graph.addEdge('C', 'D', 8);
-  graph.addEdge('C', 'E', 7);
-  graph.addEdge('E', 'D', 5);
+  Graph<char, true, false> graph;
 
-  graph.addEdge('B', 'E', 15);
-  graph.addEdge('B', 'F', 6);
+  graph.addEdge('A', 'B', 2);
+  graph.addEdge('A', 'G', 3);
+  graph.addEdge('B', 'G', 6);
 
-  graph.addEdge('E', 'F', 8);
-  graph.addEdge('E', 'G', 9);
-  graph.addEdge('G', 'F', 11);
+  graph.addEdge('A', 'F', 7);
+  graph.addEdge('F', 'I', 5);
+  graph.addEdge('F', 'E', 6);
+
+  graph.addEdge('B', 'C', 4);
+  graph.addEdge('C', 'H', 2);
+  graph.addEdge('C', 'D', 2);
+
+  graph.addEdge('G', 'I', 1);
+  graph.addEdge('G', 'H', 3);
+  graph.addEdge('I', 'H', 4);
+
+  graph.addEdge('I', 'E', 2);
+  graph.addEdge('H', 'D', 8);
+  graph.addEdge('E', 'D', 1);
 
   auto met = graph.getMinimumExpansionTree();
+  // auto cheap = graph.getCheapestPath('A', 'G');
+  //
+  // for (const auto &node : cheap) {
+  //   std::cout << node.second << " ";
+  // }
+  // std::cout << std::endl;
 
   for (const auto &edge : met) {
     std::cout << std::get<0>(edge) << " - " << std::get<1>(edge) << " : "

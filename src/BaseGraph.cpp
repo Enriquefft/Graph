@@ -2,11 +2,9 @@
 #include <queue>
 #include <stdexcept>
 
-#include "../../utils/utils.h"
-#include "BaseGraph.h"
+#include "BaseGraph.hpp"
 
 using std::vector;
-using utils::unsignedCast;
 
 /*
   #################################################################
@@ -39,7 +37,7 @@ void BaseGraph<vertex_t, weighted, directed>::addVertex(
   if (isVertex(vertex)) {
     throw std::runtime_error("Vertex already exists");
   }
-  unsigned int Vsize = unsignedCast(m_vertices.size());
+  auto Vsize = static_cast<unsigned int>(m_vertices.size());
   m_vertices[vertex] = Vsize;
   lookup_table[Vsize] = vertex;
 
@@ -120,7 +118,7 @@ void BaseGraph<vertex_t, weighted, directed>::removeEdge(const vertex_t &fromV,
 template <typename vertex_t, bool weighted, bool directed>
 auto BaseGraph<vertex_t, weighted, directed>::getVertexCount() const
     -> unsigned int {
-  return unsignedCast(m_vertices.size());
+  return static_cast<unsigned int>(m_vertices.size());
 }
 
 // ################ GET EDGE COUNT ##################
